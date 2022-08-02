@@ -1,8 +1,11 @@
 ﻿import React, { Component } from "react";
 import { deleteMovie, getMovies } from "../services/fakeMovieService";
+import Like from "./common/like";
+import Pagination from "./common/pagination";
+import { paginate } from "./../utils/paginate";
 
 class Movies extends Component {
-  state = { movies: getMovies(), listLiked: [] };
+  state = { movies: getMovies(), pageSize: 4, currentPage: 1 };
 
   handleDelete = (movie) => {
     deleteMovie(movie._id);
@@ -10,17 +13,16 @@ class Movies extends Component {
   };
 
   handleLike = (movie) => {
-    const listLiked = [...this.state.listLiked];
-    if (this.state.listLiked.includes(movie._id)) {
-      var index = listLiked.indexOf(movie._id);
-      if (index !== -1) {
-        listLiked.splice(index, 1);
-      }
-    }
-    //listLiked.filter((e) => e !== movie._id);
-    else listLiked.push(movie._id);
-    console.log("depois", listLiked);
-    this.setState({ listLiked });
+    const movies = [...this.state.movies];
+    var index = movies.indexOf(movie);
+    movies[index] = { ...movies[index] };
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
+  };
+
+  handlePageChange = (page) => {
+    this.setState({ currentPage: page });
+    //Change the current data
   };
 
   getClass = (movie) => {
@@ -31,6 +33,9 @@ class Movies extends Component {
 
   render() {
     const { length: count } = this.state.movies;
+    const { pageSize, currentPage, movies: allMovies } = this.state;
+    const movies = paginate(allMovies, currentPage, pageSize);
+
     if (count === 0) return "No movies in Database";
     return (
       <>
@@ -47,7 +52,7 @@ class Movies extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.movies.map((movie, index) => {
+            {movies.map((movie, index) => {
               return (
                 <tr key={index}>
                   <th>{movie.title}</th>
@@ -55,12 +60,10 @@ class Movies extends Component {
                   <th>{movie.numberInStock}</th>
                   <th>{movie.dailyRentalRate}</th>
                   <th>
-                    <i
-                      style={{ cursor: "pointer" }}
+                    <Like
+                      liked={movie.liked}
                       onClick={() => this.handleLike(movie)}
-                      className={this.getClass(movie)}
-                      aria-hidden="true"
-                    ></i>
+                    />
                   </th>
                   <th>
                     <button
@@ -75,6 +78,13 @@ class Movies extends Component {
             })}
           </tbody>
         </table>
+
+        <Pagination
+          itemsCount={count}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </>
     );
   }
