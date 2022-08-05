@@ -5,8 +5,7 @@ const Like = (props) => {
   if (!props.liked) classes += "-o";
   return (
     <i
-      style={{ cursor: "pointer" }}
-      className={classes}
+      className={"clickable " + classes}
       onClick={props.onClick}
       aria-hidden="true"
     ></i>

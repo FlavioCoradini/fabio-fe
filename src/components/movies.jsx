@@ -1,6 +1,6 @@
 ﻿import React, { Component } from "react";
 import _ from "loadsh";
-import { deleteMovie, getMovies } from "../services/fakeMovieService";
+import { getMovies } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 import MoviesTable from "./moviesTable";
 import Pagination from "./common/pagination";
@@ -25,8 +25,9 @@ class Movies extends Component {
   }
 
   handleDelete = (movie) => {
-    deleteMovie(movie._id);
-    this.setState({ movies: getMovies() });
+    let movies = [...this.state.movies];
+    movies = movies.filter((m) => m._id !== movie._id);
+    this.setState({ movies });
   };
 
   handleSort = (sortColumn) => {
@@ -55,13 +56,11 @@ class Movies extends Component {
     );
   };
 
-  render() {
-    const { length: count } = this.state.movies;
+  getPagedData() {
     const {
       pageSize,
       currentPage,
       movies: allMovies,
-      genres,
       selectedGenre,
       sortColumn,
     } = this.state;
@@ -74,7 +73,17 @@ class Movies extends Component {
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(sorted, currentPage, pageSize);
 
+    return { totalCount: filtered.length, data: movies };
+  }
+
+  render() {
+    const { length: count } = this.state.movies;
+    const { pageSize, currentPage, genres, selectedGenre, sortColumn } =
+      this.state;
+
     if (count === 0) return "No movies in Database";
+
+    const { totalCount, data: movies } = this.getPagedData();
 
     return (
       <div className="row m-2">
@@ -86,7 +95,7 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
-          <p> Showing {filtered.length} movies in Database. </p>
+          <p> Showing {totalCount} movies in Database. </p>
           <MoviesTable
             movies={movies}
             onLike={this.handleLike}
@@ -96,7 +105,7 @@ class Movies extends Component {
           />
 
           <Pagination
-            itemsCount={filtered.length}
+            itemsCount={totalCount}
             pageSize={pageSize}
             currentPage={currentPage}
             onPageChange={this.handlePageChange}
