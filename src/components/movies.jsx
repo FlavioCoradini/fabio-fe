@@ -95,6 +95,12 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
+          <button
+            className="btn btn-primary"
+            onClick={() => this.props.history.push("/movies/new")}
+          >
+            New movie
+          </button>
           <p> Showing {totalCount} movies in Database. </p>
           <MoviesTable
             movies={movies}
