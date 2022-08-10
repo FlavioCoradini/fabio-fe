@@ -1,14 +1,14 @@
 ﻿import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
-import { getMovie } from "../services/fakeMovieService";
+import { getMovie, saveMovie } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 
 class MovieForm extends Form {
   state = {
     data: {
       title: "",
-      genreId: "",
+      // genreId: "",
       numberInStock: "",
       dailyRentalRate: "",
     },
@@ -26,16 +26,16 @@ class MovieForm extends Form {
         const data = {
           ...this.state.data,
           title,
-          genreId: genre._id,
+          // genreId: genre._id,
           numberInStock,
           dailyRentalRate,
         };
         this.setState({ data });
       }
     }
-    this.setState({
-      genres: [{ name: "All Genres" }, ...getGenres()],
-    });
+    // this.setState({
+    //   genres: [{ name: "All Genres" }, ...getGenres()],
+    // });
   }
 
   schema = {
@@ -44,9 +44,18 @@ class MovieForm extends Form {
     dailyRentalRate: Joi.number().required().min(0).max(10).label("Rate"),
   };
 
-  onSubmit = () => {
-    console.log("saving", this.state);
-    // Navigate to /products
+  doSubmit = () => {
+    console.log("save in movi form", this.state);
+    const { title, numberInStock, dailyRentalRate } = this.state.data;
+    const movie = {
+      title,
+      numberInStock,
+      dailyRentalRate,
+      genre: {
+        _id: "5b21ca3eeb7f6fbccd471814",
+      },
+    };
+    saveMovie(movie);
     this.props.history.push("/movies");
   };
 
