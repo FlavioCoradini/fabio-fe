@@ -33,9 +33,9 @@ class MovieForm extends Form {
         this.setState({ data });
       }
     }
-    // this.setState({
-    //   genres: [{ name: "All Genres" }, ...getGenres()],
-    // });
+    this.setState({
+      genres: [...getGenres()],
+    });
   }
 
   schema = {
@@ -65,6 +65,14 @@ class MovieForm extends Form {
         <h2>Movie Form</h2>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title")}
+          <div className="form-group">
+            <label style={{ display: "block", width: "100%" }}>Genre</label>
+            <select className="form-select">
+              {this.state.genres.map((g) => (
+                <option value={g._id}>{g.name}</option>
+              ))}
+            </select>
+          </div>
           {this.renderInput("numberInStock", "Number in stock", "number")}
           {this.renderInput("dailyRentalRate", "Rate", "number")}
           {this.renderButton("Register")}
