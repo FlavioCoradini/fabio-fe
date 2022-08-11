@@ -8,7 +8,7 @@ class MovieForm extends Form {
   state = {
     data: {
       title: "",
-      // genreId: "",
+      genreId: "",
       numberInStock: "",
       dailyRentalRate: "",
     },
@@ -16,46 +16,40 @@ class MovieForm extends Form {
     genres: [],
   };
 
-  componentDidMount() {
-    const { id } = this.props.match.params;
-    if (id !== "new") {
-      const movie = getMovie(id);
-      if (!movie) this.props.history.push("/not-found");
-      else {
-        const { title, genre, numberInStock, dailyRentalRate } = movie;
-        const data = {
-          ...this.state.data,
-          title,
-          // genreId: genre._id,
-          numberInStock,
-          dailyRentalRate,
-        };
-        this.setState({ data });
-      }
-    }
-    this.setState({
-      genres: [...getGenres()],
-    });
-  }
-
   schema = {
+    _id: Joi.string(),
     title: Joi.string().required().label("Title"),
+    genreId: Joi.string().required().label("Genre"),
     numberInStock: Joi.number().required().min(0).label("Number in stock"),
     dailyRentalRate: Joi.number().required().min(0).max(10).label("Rate"),
   };
 
-  doSubmit = () => {
-    console.log("save in movi form", this.state);
-    const { title, numberInStock, dailyRentalRate } = this.state.data;
-    const movie = {
-      title,
-      numberInStock,
-      dailyRentalRate,
-      genre: {
-        _id: "5b21ca3eeb7f6fbccd471814",
-      },
+  componentDidMount() {
+    this.setState({
+      genres: [...getGenres()],
+    });
+
+    const { id } = this.props.match.params;
+    if (id === "new") return;
+
+    const movie = getMovie(id);
+    if (!movie) this.props.history.replace("/not-found");
+
+    this.setState({ data: this.mapToViewModel(movie) });
+  }
+
+  mapToViewModel = (movie) => {
+    return {
+      _id: movie._id,
+      title: movie.title,
+      genreId: movie.genre._id,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.dailyRentalRate,
     };
-    saveMovie(movie);
+  };
+
+  doSubmit = () => {
+    saveMovie(this.state.data);
     this.props.history.push("/movies");
   };
 
@@ -65,17 +59,10 @@ class MovieForm extends Form {
         <h2>Movie Form</h2>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title")}
-          <div className="form-group">
-            <label style={{ display: "block", width: "100%" }}>Genre</label>
-            <select className="form-select">
-              {this.state.genres.map((g) => (
-                <option value={g._id}>{g.name}</option>
-              ))}
-            </select>
-          </div>
+          {this.renderSelect("genreId", "Genre", this.state.genres)}
           {this.renderInput("numberInStock", "Number in stock", "number")}
           {this.renderInput("dailyRentalRate", "Rate", "number")}
-          {this.renderButton("Register")}
+          {this.renderButton("Save")}
         </form>
       </div>
     );
