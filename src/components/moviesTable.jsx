@@ -12,10 +12,6 @@ class MovieTable extends Component {
       ),
     },
     {
-      name: "Genre",
-      path: "genre.name",
-    },
-    {
       name: "Stock",
       path: "numberInStock",
     },

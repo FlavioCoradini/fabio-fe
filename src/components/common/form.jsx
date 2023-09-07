@@ -35,7 +35,6 @@ class Form extends Component {
     };
 
     const { error } = Joi.validate(this.state.data, this.schema, options);
-
     if (!error) return null;
     const errors = {};
     error.details.forEach((item) => {
@@ -65,20 +64,6 @@ class Form extends Component {
         name={name}
         label={label}
         type={type}
-        value={data[name]}
-        error={errors[name]}
-        onChange={this.handleChange}
-      />
-    );
-  };
-
-  renderSelect = (name, label, options) => {
-    const { data, errors } = this.state;
-    return (
-      <Select
-        name={name}
-        label={label}
-        options={options}
         value={data[name]}
         error={errors[name]}
         onChange={this.handleChange}

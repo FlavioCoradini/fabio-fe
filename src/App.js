@@ -1,36 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import Movies from "./components/movies";
+import Notes from "./pages/notes";
 import NavBar from "./components/navbar";
-import Costumers from "./components/costumers";
-import Rentals from "./components/rentals";
 import NotFound from "./components/notFound";
-import MovieForm from "./components/movieForm";
-import LoginForm from "./components/loginForm";
-import RegisterForm from "./components/registerForm";
+import NoteForm from "./components/noteForm";
 import "./App.css";
+import { initGA, logPageView } from "./analytics";
+import UpdateNote from "./pages/updateNote";
+import CreateNote from "./pages/createNote";
 
-class App extends React.Component {
-  render() {
-    return (
-      <>
-        <NavBar />
-        <main className="container">
-          <Switch>
-            <Route path="/login" component={LoginForm} />
-            <Route path="/register" component={RegisterForm} />
-            <Route path="/movies/:id" component={MovieForm} />
-            <Route path="/movies" component={Movies} />
-            <Route path="/costumers" component={Costumers} />
-            <Route path="/rentals" component={Rentals} />
-            <Route path="/not-found" component={NotFound} />
-            <Redirect exact from="/" to="/movies" />
-            <Redirect to="not-found" />
-          </Switch>
-        </main>
-      </>
-    );
-  }
+function App() {
+  useEffect(() => {
+    initGA();
+    logPageView();
+  }, []);
+
+  return (
+    <>
+      <NavBar />
+      <main className="container">
+        <Switch>
+          <Route path="/notes/update/:id" component={NoteForm} />
+          <Route path="/notes/detail/:id" component={NoteForm} />
+          <Route path="/notes/delete/:id" component={NoteForm} />
+          <Route path="/notes/:id" component={NoteForm} />
+          <Route path="/notes" component={Notes} />
+          <Route path="/not-found" component={NotFound} />
+          <Redirect exact from="/" to="/notes" />
+          <Redirect to="not-found" />
+        </Switch>
+      </main>
+    </>
+  );
 }
 
 export default App;
